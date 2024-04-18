@@ -69,13 +69,5 @@ pr_values <- pr.curve(scores.class0 = predicted_probabilities_yes,
                       weights.class0 = as.numeric(test.data$is_fraud == "yes"), curve = TRUE)
 plot(pr_values, main = "Precision-Recall Curve", xlab = "Recall", ylab = "Precision", type = "l", lwd = 2)
 
-## Here I wanted to focus on comparing the results of the two models. 
-## Need more computing power to build out RF model for fraud. Decision trees are costly,
-# had to downsample which skews the results. Out of box though, RF performs better because 
-# it is not sensitive to the magnitude of data.
-
-## When using the same features, RF is a better classifier for unbalanced data than logistic regression
-## I can achieve good results on the model when I resample, but this is not ideal.
-## Explainability/Interpretability. The beta coefficients help us interpret the effect some attribute will have on our 
-#target variable. With a logisitic model, for every factor in every column, I will end up with some beta. There are
-#thousands of jobs, 
+# Decision trees are costly, had to downsample which skews the results. 
+# Out of box though, RF performs better because it is not sensitive to the magnitude of data.
