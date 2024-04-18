@@ -62,9 +62,3 @@ plot(pr_curve, main = "Precision-Recall Curve")
 pred.y.test <- ifelse(predictions > 0.04, 1, 0) 
 confusionMatrix(as.factor(pred.y.test), as.factor(test.data$is_fraud), 
                 positive = "1") 
-
-## PRROC Is probably better for this data since imbalanced ##
-## Logistic regression can be bad at unbalanced data because the training algorithm doesn't account for the 
-## skewed distribution. This affects the model's intercept estimate, which skews the predicted probabilities.
-
-## Down sampling or SMOTE can be used but not ideal, lets try another model. 
