@@ -20,6 +20,15 @@ We use this data to do feature selection for models downstream.
 To use LogisticRegressionFraud.R and TreesFraud.R you must change the data variable
 in each file to the engineered fraud dataset that we created in the first part of the analysis.
 
+For the models, I am using a premade function that is stored in another R file called 'myfunctions.R'. 
+P2 creates a train/test split given a proportion.
+P3 creates a train/test/val split given proportions.
+Also includes a function for Euclidean distance. 
+Feel free to save it for future use. It is loaded by storing the R file on your local machine and accessing it via
+the source command and pointing to the directory location.
+
+If you don't want to use these functions, you can just create your own train/test via whatever method you prefer. 
+
 ## Presentation for Teaching
 
 I opted out of using Rmarkdown and instead chose to present results in presentation format
