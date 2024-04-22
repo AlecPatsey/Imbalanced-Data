@@ -23,20 +23,10 @@ RF_Model_df <-data %>% select(merchant,category,amt,gender,lat,long,city_pop,
 
 RF_Model_df <- RF_Model_df %>% mutate(is_fraud = ifelse(is_fraud==0, "no","yes"))
 RF_Model_df$is_fraud <- as.factor(RF_Model_df$is_fraud)
+str(RF_Model_df)
 
-fraud_indices <- which(RF_Model_df$is_fraud == "yes")
-non_fraud_indices <- which(RF_Model_df$is_fraud == "no")
-fraud_sampled <- sample(fraud_indices, 1000)
-non_fraud_downsampled <- sample(non_fraud_indices, 200000)
-downsampled_indices <- c(fraud_sampled, non_fraud_downsampled)
-downsampled_data <- RF_Model_df[downsampled_indices, ]
-downsampled_data <- downsampled_data[sample(nrow(downsampled_data)), ]
 
-sum(downsampled_data$is_fraud=="no")
-sum(downsampled_data$is_fraud=="yes")
-str(downsampled_data)
-
-p2 <- partition.2(downsampled_data, 0.7) ## creating 70:30 partition
+p2 <- partition.2(RF_Model_df, 0.7) ## creating 70:30 partition
 training.data <- p2$data.train
 test.data <- p2$data.test
 
@@ -44,8 +34,7 @@ sum(training.data$is_fraud=="yes") / sum(training.data$is_fraud=="no")
 sum(test.data$is_fraud=="yes") / sum(test.data$is_fraud=="no")
 
 
-
-rf_model<-randomForest(is_fraud~.,data=training.data,mtry=11,ntree=75,nodesize=1,importance=T)
+rf_model<-randomForest(is_fraud~.,data=training.data,mtry=11,ntree=50,nodesize=1,importance=T)
 importance(rf_model)
 varImpPlot(rf_model,col=12,pch=19)
 
@@ -54,10 +43,10 @@ predicted_probabilities <- predict(rf_model, newdata = test.data, type="prob")
 df <- as.data.frame(predicted_probabilities)
 predicted_probabilities_no<- df[, 1]
 predicted_probabilities_yes <- df[, 2]
-predicted_labels <- ifelse(predicted_probabilities_yes > .08, "yes", "no")
+predicted_labels <- ifelse(predicted_probabilities_yes > .12, "yes", "no")
 confusionMatrix(as.factor(predicted_labels), as.factor(test.data$is_fraud), positive="yes")
 
- #ROC#
+#ROC#
 roc_curve <- roc(test.data$is_fraud, predicted_probabilities_yes)
 plot(roc_curve, main = "ROC Curve", col = "blue")
 auc_value <- auc(roc_curve)
@@ -68,6 +57,3 @@ text(0.7, 0.5, paste("AUC =", round(auc_value, 2)), col = "black", cex = 1.2)
 pr_values <- pr.curve(scores.class0 = predicted_probabilities_yes,
                       weights.class0 = as.numeric(test.data$is_fraud == "yes"), curve = TRUE)
 plot(pr_values, main = "Precision-Recall Curve", xlab = "Recall", ylab = "Precision", type = "l", lwd = 2)
-
-# Decision trees are costly, had to downsample which skews the results. 
-# Out of box though, RF performs better because it is not sensitive to the magnitude of data.
