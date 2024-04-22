@@ -12,6 +12,7 @@ RNGkind (sample.kind = "Rounding")
 set.seed(0)
 
 #########EDA/Engineering #######################
+################################################
 length(data)
 sum(is.na(data))
 table(data$is_fraud) ##Comment on class imbalances 
@@ -23,8 +24,10 @@ data.frame(Unique_Values = uniques)
 # Group by category, return summary statistics about each category
 df_grouped <- data %>% 
   group_by(category) %>%
-  summarize(mean(amt), n(), Fraud_Rate_percent=mean(is_fraud),max(amt),min(amt))
+  summarize(n(), Fraud_Rate_percent=100*mean(is_fraud))
 print(df_grouped)
+## Comment on fraud rate for categories
+
 
 # Extract date and month, create age.
 data$date <- as.Date(data$trans_date_trans_time)
@@ -35,13 +38,11 @@ data$transaction_year<-as.Date(dmy_hm(data$trans_date_trans_time), format = "%d/
 data$transaction_year <- format(data$transaction_year, "%Y")
 data$age_of_user <- as.double(data$transaction_year)-as.double(data$dob_year)
 
-# Histogram of amt. Non normal - log transform to make normally dist. if needed. 
 hist(data$amt, breaks = 20, col = "lightblue", main = "Histogram of AMT", xlab = "Amount")
 data$log_amt <- log(data$amt)
 hist(data$log_amt, breaks = 20, col = "lightblue", main = "Histogram of Log-transformed 'amt'", xlab = "Log(Amount)")
 names(data)
 
-# Bin age for EDA, we will probably use age instead of age binned as a feature.
 data$age_binned <- cut(data$age_of_user, 
                        breaks = c(15, 25, 35,45, 55, 65, 75, 85, 100),
                        labels = c("15-25", "25-35", "35-45", "45-55","55-65","65-75","75-85","85-100"),
@@ -51,7 +52,7 @@ df_grouped <- data %>%
   summarize(n(), Fraud_Rate_percent=100*mean(is_fraud)) ## It seems the older you get the more susceptible to fraud
 print(df_grouped)
 
-# Create number of transactions on this account
+###Create number of transactions on this account###
 data$full_name<- paste0(data$first," ",data$last)
 data <- data %>%
   group_by(full_name) %>%
@@ -62,6 +63,7 @@ data <- data %>%
 data <- data %>%
   mutate(
     trans_day = wday(as.Date(trans_date_trans_time, format="%d/%m/%Y"), label=TRUE))
+
 df_grouped <- data %>% 
   group_by(trans_day) %>%
   summarize(n(), Fraud_Rate_percent=100*mean(is_fraud))
